@@ -8,4 +8,10 @@ pdf = pd.read_csv('data/ChifromSentinal.csv')
 pdf = pdf.iloc[:, 1].values
 y = c.normalized_data(pdf, 0, 1)
 
-c.generate_parameters()
+num_iter = 10
+min_η_per, max_η_per = 0.1, 2.0
+min_η_med, max_η_med = 0.05, 0.5
+min_η_noise, max_η_noise = 0.01, 0.2
+min_σ, max_σ = 0.01, 0.3
+c.generate_parameters('yes', num_iter, min_η_per, max_η_per, min_η_med, max_η_med,\
+						min_η_noise, max_η_noise, min_σ, max_σ)

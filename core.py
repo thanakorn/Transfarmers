@@ -20,29 +20,60 @@ def plot_cross_section(data, lowest_value, highest_value, save_file):
 	plt.savefig('image_out/' + save_file, format='svg', transparent=True)
 	plt.show()
 
-def create_random(random_seed, n_i, min_p1, max_p1, min_p2, max_p2):
+def sub_1(num_iter, min_p, max_p):
+	p = np.zeros(shape=num_iter, dtype=float)
+	for i in range (num_iter):
+		p[i] = random.random()
+	return normalized_data(p, min_p, max_p)
+
+def create_random(random_seed, num_iter, min_η_per, max_η_per, min_η_med, max_η_med,\
+					min_η_noise, max_η_noise, min_σ, max_σ):
 	if random_seed == 'yes':
 		random.seed(10)
 	elif random_seed == 'no':
 		pass
 
-	p1 = np.zeros(shape=n_i, dtype=float)
-	for i in range (n_i):
-		p1[i] = random.random()
-	p1 = normalized_data(p1, min_p1, max_p1)
+	η_per = np.zeros(shape=num_iter, dtype=float)
+	for i in range (num_iter):
+		η_per[i] = random.random()
+	η_per = normalized_data(η_per, min_η_per, max_η_per)
 
-	p2 = np.zeros(shape=n_i, dtype=float)
-	for i in range (n_i):
-		p2[i] = random.random()
-	p2 = normalized_data(p2, min_p2, max_p2)
+	η_med = np.zeros(shape=num_iter, dtype=float)
+	for i in range (num_iter):
+		η_med[i] = random.random()
+	η_med = normalized_data(η_med, min_η_med, max_η_med)
 
-	return p1, p2
+	η_noise = np.zeros(shape=num_iter, dtype=float)
+	for i in range (num_iter):
+		η_noise[i] = random.random()
+	η_noise = normalized_data(η_noise, min_η_noise, max_η_noise)
 
-def generate_parameters():
-	optimizer = {'methods': ['η_per', 'ℓ_pdecay', 'period', 'ℓ_psmooth', 'η_med', 'ℓ_med', 'α',\
-					'η_trend', 'ℓ_trend', 'η_noise', 'ℓ_noise', 'σ']}
-	for i in optimizer['methods']:
-		print(i)
+	σ = np.zeros(shape=num_iter, dtype=float)
+	for i in range (num_iter):
+		σ[i] = random.random()
+	σ = normalized_data(σ, min_σ, max_σ)
+
+	return η_per, η_med, η_noise, σ   
+
+def generate_parameters(random_seed, num_iter, min_η_per, max_η_per, min_η_med, max_η_med,\
+						min_η_noise, max_η_noise, min_σ, max_σ):
+    # num_loop = num_lr*num_wd*num_mo	
+	η_per, η_med, η_noise, σ = create_random(random_seed, num_iter, min_η_per, max_η_per,\
+									min_η_med, max_η_med, min_η_noise, max_η_noise, min_σ, max_σ)
+	optimizer = {'η_per': list(η_per),
+				'η_med': list(η_med),
+				'η_noise': list(η_noise),
+				'σ': list(σ)
+				}
+
+	for η_per_i in optimizer['η_per']:
+		for η_med_i in optimizer['η_med']:
+			for η_noise_i in optimizer['η_noise']:
+				for σ_i in optimizer['σ']:
+					print('η_per: ', η_per_i,
+						'η_med: ', η_med_i,
+						'η_noise: ', η_noise_i,
+						'σ: ', σ_i)
 
 def main_GPR(y, p1, p2):
 	# TODO training
@@ -50,7 +81,7 @@ def main_GPR(y, p1, p2):
 	with pm.Model() as model:
 		# NOTE season
 		# yearly periodic component x long term trend
-		η_per = pm.HalfCauchy("η_per", beta=p1, testval=p2)
+		η_per = pm.HalfCauchy("η_per", beta=2, testval=1.0)
 		ℓ_pdecay = pm.Gamma("ℓ_pdecay", alpha=10, beta=0.075)
 		period  = pm.Normal("period", mu=1, sd=0.05)
 		ℓ_psmooth = pm.Gamma("ℓ_psmooth ", alpha=4, beta=3)
