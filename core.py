@@ -55,27 +55,7 @@ def create_random(random_seed, num_iter, min_η_per, max_η_per, min_η_med, max
 
 	return η_per, η_med, η_noise, σ   
 
-def generate_parameters(random_seed, num_iter, min_η_per, max_η_per, min_η_med, max_η_med,\
-						min_η_noise, max_η_noise, min_σ, max_σ):
-    # num_loop = num_lr*num_wd*num_mo	
-	η_per, η_med, η_noise, σ = create_random(random_seed, num_iter, min_η_per, max_η_per,\
-									min_η_med, max_η_med, min_η_noise, max_η_noise, min_σ, max_σ)
-	optimizer = {'η_per': list(η_per),
-				'η_med': list(η_med),
-				'η_noise': list(η_noise),
-				'σ': list(σ)
-				}
-
-	for η_per_i in optimizer['η_per']:
-		for η_med_i in optimizer['η_med']:
-			for η_noise_i in optimizer['η_noise']:
-				for σ_i in optimizer['σ']:
-					print('η_per: ', η_per_i,
-						'η_med: ', η_med_i,
-						'η_noise: ', η_noise_i,
-						'σ: ', σ_i)
-
-def main_GPR(y, η_per_i, η_med_i, η_noise_i, σ_i):
+def main_GPR(y, η_per_i, η_med_i, η_noise_i, σ_i, count):
 	# TODO training
 	X = np.linspace(0, len(y), len(y))[:, None]
 	with pm.Model() as model:
@@ -133,15 +113,16 @@ def main_GPR(y, η_per_i, η_med_i, η_noise_i, σ_i):
 	fig = plt.figure(figsize=(12, 5))
 	ax = fig.gca()
 	plot_gp_dist(ax, pred_samples["f_pred"], X_new)
-	plt.plot(X_true, y, "ok", ms=3, alpha=0.5, label="Observed data")
+	plt.scatter(X_true, y, c='green', s=20, edgecolor='black', linewidths=1.5, alpha=0.9,\
+				label="Observed data")
 	plt.xlabel('Months')
 	plt.ylabel('Pixels')
 	# plt.ylim([-13, 13])
-	plt.title("η_per = {:.4f}, η_med = {:.4f}, η_noise = {:.4f}, σ = {:.4f}".format(η_per, η_med, η_noise, σ))
+	plt.title('η_per: {:.4f}, η_med: {:.4f}, η_noise: {:.4f}, σ: {:.4f}'.format(η_per_i, η_med_i, η_noise_i, σ_i))
 	plt.legend()
-	save_file = 'test'
-	plt.savefig('image_out/' + save_file + '.png', format='png', bbox_inches='tight',\
-				dpi='300', transparent=True, pad_inches=0)
+	save_file = 'trace' + str(count).zfill(5)
+	plt.savefig('image_multiple_traces/' + save_file + '.png', format='png', bbox_inches='tight',\
+				dpi=300, transparent=False, pad_inches=0.2)
 	# plt.show()
 
 	# TODO plot mean and +-SD
@@ -153,13 +134,42 @@ def main_GPR(y, η_per_i, η_med_i, η_noise_i, σ_i):
 	plt.plot(X_new, mu + 2 * sd, "r", lw=1)
 	plt.plot(X_new, mu - 2 * sd, "r", lw=1)
 	plt.fill_between(X_new.flatten(), mu - 2 * sd, mu + 2 * sd, color="r", alpha=0.5)
-	plt.plot(X_true, y, "ok", ms=3, alpha=0.5, label="Observed data")
+	plt.scatter(X_true, y, c='green', s=20, edgecolor='black', linewidths=1.5, alpha=0.9,\
+				label="Observed data")
 	plt.xlabel('Months')
 	plt.ylabel('Pixels')
 	# plt.ylim([-13, 13])
-	plt.title('Mean and SD')
+	plt.title('η_per: {:.4f}, η_med: {:.4f}, η_noise: {:.4f}, σ: {:.4f}'.format(η_per_i,\
+				η_med_i, η_noise_i, σ_i))
 	plt.legend()
-	save_file = 'test2'
-	plt.savefig('image_out/' + save_file + '.png', format='png', bbox_inches='tight',\
-				dpi='300', transparent=True, pad_inches=0)
+	save_file = 'mean' + str(count).zfill(5)
+	plt.savefig('image_means/' + save_file + '.png', format='png', bbox_inches='tight',\
+				dpi=300, transparent=False, pad_inches=0.2)
 	# plt.show()
+	print('save image: ', save_file)
+
+def generate_parameters(random_seed, num_iter, min_η_per, max_η_per, min_η_med, max_η_med,\
+						min_η_noise, max_η_noise, min_σ, max_σ, data):
+	η_per, η_med, η_noise, σ = create_random(random_seed, num_iter, min_η_per, max_η_per,\
+									min_η_med, max_η_med, min_η_noise, max_η_noise, min_σ, max_σ)
+	optimizer = {'η_per': list(η_per),
+				'η_med': list(η_med),
+				'η_noise': list(η_noise),
+				'σ': list(σ)
+				}
+	num_loop = pow(num_iter, 4)
+	count = 1
+
+	for η_per_i in optimizer['η_per']:
+		for η_med_i in optimizer['η_med']:
+			for η_noise_i in optimizer['η_noise']:
+				for σ_i in optimizer['σ']:
+					print('progress: {:.4f}'.format((count/num_loop) * 100))
+					print(
+						'η_per: ', η_per_i,
+						'η_med: ', η_med_i,
+						'η_noise: ', η_noise_i,
+						'σ: ', σ_i
+						)
+					main_GPR(data, η_per_i, η_med_i, η_noise_i, σ_i, count)
+					count += 1
