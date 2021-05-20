@@ -75,13 +75,13 @@ def generate_parameters(random_seed, num_iter, min_η_per, max_η_per, min_η_me
 						'η_noise: ', η_noise_i,
 						'σ: ', σ_i)
 
-def main_GPR(y, p1, p2):
+def main_GPR(y, η_per_i, η_med_i, η_noise_i, σ_i):
 	# TODO training
 	X = np.linspace(0, len(y), len(y))[:, None]
 	with pm.Model() as model:
 		# NOTE season
 		# yearly periodic component x long term trend
-		η_per = pm.HalfCauchy("η_per", beta=2, testval=1.0)
+		η_per = pm.HalfCauchy("η_per", beta=2, testval=η_per_i)
 		ℓ_pdecay = pm.Gamma("ℓ_pdecay", alpha=10, beta=0.075)
 		period  = pm.Normal("period", mu=1, sd=0.05)
 		ℓ_psmooth = pm.Gamma("ℓ_psmooth ", alpha=4, beta=3)
@@ -91,7 +91,7 @@ def main_GPR(y, p1, p2):
 
 		# NOTE intermidate
 		# small/medium term irregularities
-		η_med = pm.HalfCauchy("η_med", beta=0.5, testval=0.1)
+		η_med = pm.HalfCauchy("η_med", beta=0.5, testval=η_med_i)
 		ℓ_med = pm.Gamma("ℓ_med", alpha=2, beta=0.75)
 		α = pm.Gamma("α", alpha=5, beta=2) 
 		cov_medium = η_med**2 * pm.gp.cov.RatQuad(1, ℓ_med, α)
@@ -108,9 +108,9 @@ def main_GPR(y, p1, p2):
 
 		# NOTE noise
 		# noise model
-		η_noise = pm.HalfNormal("η_noise", sd=0.5, testval=0.05)
+		η_noise = pm.HalfNormal("η_noise", sd=0.5, testval=η_noise_i)
 		ℓ_noise = pm.Gamma("ℓ_noise", alpha=2, beta=4)
-		σ = pm.HalfNormal("σ",  sd=0.25, testval=0.05)
+		σ = pm.HalfNormal("σ",  sd=0.25, testval=σ_i)
 		cov_noise = η_noise**2 * pm.gp.cov.Matern52(1, ℓ_noise) +\
 					pm.gp.cov.WhiteNoise(σ)
 
@@ -137,10 +137,12 @@ def main_GPR(y, p1, p2):
 	plt.xlabel('Months')
 	plt.ylabel('Pixels')
 	# plt.ylim([-13, 13])
-	plt.title('Time Series')
+	plt.title("η_per = {:.4f}, η_med = {:.4f}, η_noise = {:.4f}, σ = {:.4f}".format(η_per, η_med, η_noise, σ))
 	plt.legend()
-	plt.savefig('image_out/' + 'time_series_mj.svg', format='svg', transparent=True)
-	plt.show()
+	save_file = 'test'
+	plt.savefig('image_out/' + save_file + '.png', format='png', bbox_inches='tight',\
+				dpi='300', transparent=True, pad_inches=0)
+	# plt.show()
 
 	# TODO plot mean and +-SD
 	mu, var = gp.predict(X_new, point=mp, diag=True)
@@ -157,5 +159,7 @@ def main_GPR(y, p1, p2):
 	# plt.ylim([-13, 13])
 	plt.title('Mean and SD')
 	plt.legend()
-	plt.savefig('image_out/' + 'credible_mj.svg', format='svg', transparent=True)
-	plt.show()
+	save_file = 'test2'
+	plt.savefig('image_out/' + save_file + '.png', format='png', bbox_inches='tight',\
+				dpi='300', transparent=True, pad_inches=0)
+	# plt.show()
