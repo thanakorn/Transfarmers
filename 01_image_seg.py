@@ -13,13 +13,12 @@ data, _, _ = c.cleaning_data(data)
 band_number = 8 
 data = data[:, :, band_number-1]
 max_num, min_num = c.clip(data, 5)
-# c.plot_imshow(data, min_num, max_num, 'band: ' + str(band_number),\
-#                 'band_' + str(band_number))
+# c.plot_imshow(data, min_num, max_num, 'band: ' + str(band_number), 'band_' + str(band_number))
 
 # TODO k-means
 number_of_classes = 3
 kmeans = c.compute_kmeans(data, number_of_classes)
-c.plot_kmeans(kmeans, 'k-means', 'kmeans')
+# c.plot_kmeans(kmeans, 'k-means', 'kmeans')
 
 min_pixel = 1
 max_pixel = 1000

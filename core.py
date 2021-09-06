@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-import pymc3 as pm
-import theano.tensor as tt
+# import pymc3 as pm
+# import theano.tensor as tt
 import matplotlib as mpl
 import matplotlib.colors as colors
 
@@ -11,7 +11,7 @@ from skimage.measure import label, regionprops
 from sklearn.cluster import KMeans
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from pymc3.gp.util import plot_gp_dist
+# from pymc3.gp.util import plot_gp_dist
 # from sklearn.metrics import mean_squared_error
 
 def normalized_data(data, lowest_value, highest_value):
@@ -222,9 +222,8 @@ def plot_imshow(data, vmin, vmax, title_name, save_file):
 	ax.set_ylabel('pixel axis-y', fontdict={'fontsize': font_size})
 	ax.set_title(title_name)
 	plt.tight_layout()
-	plt.savefig('image_out/' + save_file + '.svg', format='svg', transparent=True)
+	plt.savefig('image_out/' + save_file + '.svg', format='svg', bbox_inches='tight', transparent=True, pad_inches=0)
 	plt.show()
-	plt.clf()
 
 def compute_kmeans(data, number_of_classes):
 	vector_data = data.reshape(-1, 1) 
@@ -238,19 +237,19 @@ def plot_kmeans(data, title_name, save_file):
 	font_size = 12 # print
 	ax = plt.gca()
 	# cmap = colors.ListedColormap(['#6475F2', '#aeaeb0', '#3D6C48', '#f3f59d'])
-	cmap = colors.ListedColormap(['#6475F2', '#3D6C48', '#aeaeb0'])
+	# cmap = colors.ListedColormap(['#6475F2', '#3D6C48', '#aeaeb0'])
+	cmap = colors.ListedColormap(['#aeaeb0', '#3D6C48', '#6475F2'])
 	im = ax.imshow(data, cmap=cmap)
 	# im = ax.imshow(data, cmap='rainbow')
 	divider = make_axes_locatable(ax)
 	cax = divider.append_axes("right", size="2%", pad=0.05)
-	plt.colorbar(im, cax=cax)
+	plt.colorbar(im, cax=cax, label='classes')
 	ax.set_xlabel('pixel axis-x', fontdict={'fontsize': font_size})
 	ax.set_ylabel('pixel axis-y', fontdict={'fontsize': font_size})
 	ax.set_title(title_name)
 	plt.tight_layout()
-	plt.savefig('image_out/' + save_file + '.svg', format='svg', transparent=True)
+	plt.savefig('image_out/' + save_file + '.svg', format='svg', bbox_inches='tight', transparent=True, pad_inches=0)
 	plt.show()
-	plt.clf()
 
 def image_segmentation(kmeans, min_pixel, max_pixel):
 	# binary = np.where(kmeans >= kmeans.max()/2, 0, 1)
