@@ -39,10 +39,11 @@ pdf = pdf.iloc[:, 1].values
 # y = c.normalized_data(pdf, -1, 1)
 # y_true = c.normalized_data(pdf, -1, 1)
 y = c.normalized_data(pdf, 0, 1)
+y = y[::10]
 y_true = c.normalized_data(pdf, 0, 1)
 
 # n = 200  # The number of data points
-n = 334  # The number of data points
+n = 34  # The number of data points
 X = np.linspace(0, 10, n)[:, None]  # The inputs to the GP must be arranged as a column vector
 
 # Define the true covariance function and its parameters
@@ -95,6 +96,8 @@ with pm.Model() as model:
 n_nonconverged = int(np.sum(az.rhat(trace)[["η", "ℓ", "f_rotated_"]].to_array() > 1.03).values)
 print("%i variables MCMC chains appear not to have converged." % n_nonconverged)
 
+filepath_p = 'trace_plot'
+np.save(filepath_p, trace.posterior["f"][0, :, :])
 # plot the results
 fig = plt.figure(figsize=(12, 5))
 ax = fig.gca()
