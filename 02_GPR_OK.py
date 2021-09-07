@@ -69,18 +69,21 @@ with pm.Model() as model:
     y_ = gp.marginal_likelihood("y", X=X, y=y, noise=cov_noise)
     mp = pm.find_MAP()
 
+    # trace = pm.sample(10, chains=2, cores=1, return_inferencedata=True)
+
 # TODO predicting
 X_new = np.linspace(0, len(y)+20, len(y)+600)[:, None]
 # add the GP conditional to the model, given the new X values
 # with model:
-#     f_pred = gp.conditional("f_pred", X_new)
-# # To use the MAP values, you can just replace the trace with a length-1 list with `mp`
+    # f_pred = gp.conditional("f_pred", X_new)
+# To use the MAP values, you can just replace the trace with a length-1 list with `mp`
 # with model:
-#     # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=2000)
-#     # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=1000)
-#     # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=500)
-#     # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=500)
-#     pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=50)
+    # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=2000)
+    # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=1000)
+    # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=500)
+    # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=500)
+    # pred_samples = pm.sample_posterior_predictive([mp], vars=[f_pred], samples=50)
+    # pred_samples = pm.sample_posterior_predictive(trace.posterior, vars=[f_pred], samples=10)
 
 # filepath_p = 'test'
 # np.save(filepath_p, pred_samples["f_pred"][:, :])
@@ -110,20 +113,22 @@ sd = np.sqrt(var)
 # draw plot
 fig = plt.figure(figsize=(12, 5))
 ax = fig.gca()
+month = np.linspace(1, 25, len(mu))
+month_2 = np.linspace(1, 25, len(y_true))
 # plot mean and 2σ intervals
-# plt.plot(X_new, mu, "r", lw=2, label="mean and 2σ region")
-plt.plot(X_new, mu, "r", lw=2, label="mean")
-# plt.plot(X_new, mu + 2 * sd, "r", lw=1)
-# plt.plot(X_new, mu - 2 * sd, "r", lw=1)
-# plt.fill_between(X_new.flatten(), mu - 2 * sd, mu + 2 * sd, color="r", alpha=0.5)
+plt.plot(month, mu, "r", lw=2, label="mean and 2σ region")
+# plt.plot(month, mu, "r", lw=2, label="mean")
+plt.plot(month, mu + 2 * sd, "r", lw=1)
+plt.plot(month, mu - 2 * sd, "r", lw=1)
+plt.fill_between(month.flatten(), mu - 2 * sd, mu + 2 * sd, color="r", alpha=0.5)
 # plot original data and true function
 plt.plot(X_true, y_true, "ok", ms=3, alpha=0.5, label="Observed data")
 # plt.plot(X_true, y_true, "ob", ms=3, alpha=0.5, label="Test datapoint")
-plt.plot(X_true, y_true, "b--", ms=3, alpha=0.5, label="Interpolation")
+# plt.plot(X_true, y_true, "b--", ms=3, alpha=0.5, label="Interpolation")
 # plt.plot(X, y, "ok", ms=3, alpha=1.0, label="observed data")
 plt.xlabel('Months')
 # plt.ylim([-13, 13])
 plt.title('Gaussian Process Regression with Boundaries')
 plt.legend()
-plt.savefig('image_out/' + 'SD_3' + '.svg', format='svg', bbox_inches='tight', transparent=True, pad_inches=0)
+plt.savefig('image_out/' + 'SD_1' + '.svg', format='svg', bbox_inches='tight', transparent=True, pad_inches=0)
 plt.show()
