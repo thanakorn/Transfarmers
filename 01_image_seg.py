@@ -19,8 +19,3 @@ max_num, min_num = c.clip(data, 5)
 number_of_classes = 3
 kmeans = c.compute_kmeans(data, number_of_classes)
 # c.plot_kmeans(kmeans, 'k-means', 'kmeans')
-
-min_pixel = 1
-max_pixel = 1000
-image_seg = c.image_segmentation(kmeans, min_pixel, max_pixel)
-c.plot_kmeans(image_seg, 'k-means + image segmentation', 'image_seg')
