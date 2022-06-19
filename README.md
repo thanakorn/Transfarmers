@@ -4,4 +4,4 @@
 
 We store the data in GD rather than store in Github due to our generated large files.
 
-Please use this link to access our repository [GitHub Pages](https://pages.github.com/).
+Please use this [LINK](https://drive.google.com/drive/folders/1JW5_IGL7pzX78VRpYRhmJxGuuzcDqamP?usp=sharing). to access our repository.
