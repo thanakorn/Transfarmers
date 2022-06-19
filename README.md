@@ -2,7 +2,7 @@
 
 # Transfarmers
 
-![example workflow](https://github.com/PongthepGeo/Transfarmers/blob/master/icon/1691759.png)
+![example workflow](https://github.com/PongthepGeo/Transfarmers/blob/master/icon/Transfarmers_logo.png)
 
 We store the data in GD rather than store in Github due to our generated large files.
 
